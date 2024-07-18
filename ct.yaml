@@ -3,5 +3,8 @@ remote: origin
 target-branch: main
 chart-dirs:
   - charts
+chart-repos:
+  - neondatabase=https://neondatabase.github.io/helm-charts
+  - test-chart=https://neondatabase.github.io/helm-charts
 helm-extra-args: '--timeout 600s'
 validate-maintainers: false
