@@ -40,6 +40,30 @@ entries:
     urls:
     - https://github.com/SeinoYuki/helm-charts/releases/download/neon-minio-1.0.0/neon-minio-1.0.0.tgz
     version: 1.0.0
+  neon-pageserver:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2024-07-18T12:02:54.912027585Z"
+    dependencies:
+    - condition: settings.s3.enabled
+      name: neon-storage-broker
+      repository: https://neondatabase.github.io/helm-charts
+      version: 1.2.*
+    - condition: settings.broker.enabled
+      name: neon-minio
+      repository: https://seinoyuki.github.io/helm-charts
+      version: 1.0.*
+    description: Neon Pageserver
+    digest: cd8ae853370baa46a58359305e11db4b0fc106f994d29b4d3b0c2284be4f3068
+    home: https://neon.tech
+    kubeVersion: ^1.18.x-x
+    name: neon-pageserver
+    sources:
+    - https://github.com/neondatabase/neon
+    type: application
+    urls:
+    - https://github.com/SeinoYuki/helm-charts/releases/download/neon-pageserver-1.0.0/neon-pageserver-1.0.0.tgz
+    version: 1.0.0
   neon-pg-sni-router:
   - apiVersion: v2
     appVersion: 0.1.0
@@ -748,6 +772,30 @@ entries:
     urls:
     - https://github.com/neondatabase/helm-charts/releases/download/neon-proxy-1.2.2/neon-proxy-1.2.2.tgz
     version: 1.2.2
+  neon-safekeeper:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2024-07-18T12:02:55.098719895Z"
+    dependencies:
+    - condition: settings.s3.enabled
+      name: neon-storage-broker
+      repository: https://neondatabase.github.io/helm-charts
+      version: 1.2.*
+    - condition: settings.broker.enabled
+      name: neon-minio
+      repository: https://seinoyuki.github.io/helm-charts
+      version: 1.0.*
+    description: Neon Safekeeper
+    digest: 2543a51fcbf57f1e205480e0383fa36f1e48a15a173f15e5122d41d76185d37b
+    home: https://neon.tech
+    kubeVersion: ^1.18.x-x
+    name: neon-safekeeper
+    sources:
+    - https://github.com/neondatabase/neon
+    type: application
+    urls:
+    - https://github.com/SeinoYuki/helm-charts/releases/download/neon-safekeeper-1.0.0/neon-safekeeper-1.0.0.tgz
+    version: 1.0.0
   neon-storage-broker:
   - apiVersion: v2
     appVersion: 0.1.0
@@ -1156,4 +1204,4 @@ entries:
     urls:
     - https://github.com/zenithdb/helm-charts/releases/download/zenith-proxy-1.0.1/zenith-proxy-1.0.1.tgz
     version: 1.0.1
-generated: "2024-07-18T11:53:30.448119839Z"
+generated: "2024-07-18T12:02:55.099303662Z"
