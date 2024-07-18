@@ -25,6 +25,21 @@ entries:
     urls:
     - https://github.com/neondatabase/helm-charts/releases/download/aws-cost-reporter-1.0.0/aws-cost-reporter-1.0.0.tgz
     version: 1.0.0
+  neon-minio:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2024-07-18T11:53:30.447682563Z"
+    description: Neon MinIO
+    digest: 99d1adf98dc4f0aecb0233710ff5a3e14cea1aac055e84b1340988b58b43249d
+    home: https://neon.tech
+    kubeVersion: ^1.18.x-x
+    name: neon-minio
+    sources:
+    - https://github.com/neondatabase/neon
+    type: application
+    urls:
+    - https://github.com/SeinoYuki/helm-charts/releases/download/neon-minio-1.0.0/neon-minio-1.0.0.tgz
+    version: 1.0.0
   neon-pg-sni-router:
   - apiVersion: v2
     appVersion: 0.1.0
@@ -1141,4 +1156,4 @@ entries:
     urls:
     - https://github.com/zenithdb/helm-charts/releases/download/zenith-proxy-1.0.1/zenith-proxy-1.0.1.tgz
     version: 1.0.1
-generated: "2024-07-15T14:51:55.251667911Z"
+generated: "2024-07-18T11:53:30.448119839Z"
