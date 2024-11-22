@@ -6,7 +6,14 @@ metadata:
     {{- include "neon-storage-controller.labels" . | nindent 4 }}
 spec:
   strategy:
+  {{- if .Values.settings.startAsCandidate }}
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  {{- else }}
     type: Recreate
+  {{- end }}
   replicas: 1
   # Which pods the Deployment is managing (duplicates template.metadata.labels).
   selector:
@@ -55,6 +62,19 @@ spec:
             - --split-threshold
             - {{ .Values.settings.splitThreshold | quote }}
           {{- end }}
+          {{- if .Values.settings.chaosInterval }}
+            - --chaos-interval
+            - {{ .Values.settings.chaosInterval | quote }}
+          {{- end }}
+            - --address-for-peers
+            - http://$(POD_IP):{{ .Values.service.port }}/
+          {{- if .Values.settings.startAsCandidate }}
+            - --start-as-candidate
+          {{- end }}
+          {{- if .Values.settings.longReconcileThreshold }}
+            - --long-reconcile-threshold
+            - {{ .Values.settings.longReconcileThreshold | quote }}
+          {{- end }}
           env:
             - name: LD_LIBRARY_PATH
               value: "/usr/local/v16/lib"
@@ -62,6 +82,10 @@ spec:
               value: "INFO"
             - name: RUST_BACKTRACE
               value: "1"
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           {{- if .Values.settings }}
             {{- with .Values.settings.sentryUrl }}
             - name: SENTRY_DSN

@@ -16,6 +16,7 @@ spec:
         {{- include "neon-storage-scrubber.labels" . | nindent 8 }}
     spec:
       backoffLimit: 0 # Do not restart if the task fails
+      activeDeadlineSeconds: {{ .Values.storageScrubber.activeDeadlineSeconds }}
       template:
         metadata:
           {{- with .Values.podAnnotations }}
@@ -40,12 +41,28 @@ spec:
               image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
               imagePullPolicy: {{ .Values.image.pullPolicy }}
               command:
+                - /usr/local/bin/storage_scrubber
+                {{- if .Values.storageScrubber.enableStorageControllerConnection }}
+                - "--controller-jwt"
+                - "$(STORAGE_CONTROLLER_JWT)"
+                - "--controller-api"
+                - {{ .Values.storageScrubber.storageControllerUrl | quote }}
+                {{- end -}}
                 {{- toYaml .Values.storageScrubber.command | nindent 16 }}
               env:
+                {{- if .Values.storageScrubber.awsBucket }}
                 - name: BUCKET
                   value: {{ .Values.storageScrubber.awsBucket }}
+                {{- end }}
+                {{- if .Values.storageScrubber.awsRegion }}
                 - name: REGION
                   value: {{ .Values.storageScrubber.awsRegion }}
+                {{- end }}
+                {{- if .Values.storageScrubber.remoteStorageConfig }}
+                - name: REMOTE_STORAGE_CONFIG
+                  value: |
+                    {{- toToml .Values.storageScrubber.remoteStorageConfig | nindent 20 }}
+                {{- end }}
                 {{- if .Values.settings }}
                 {{- with .Values.settings.sentryUrl }}
                 - name: SENTRY_DSN
@@ -59,6 +76,9 @@ spec:
                 {{- toYaml . | nindent 16 }}
                 {{- end }}
                 {{- end }}
+              envFrom:
+                - secretRef:
+                    name: {{ include "neon-storage-scrubber.fullname" . }}-env-vars
               resources:
                 {{- toYaml .Values.resources | nindent 16 }}
           {{- with .Values.nodeSelector }}

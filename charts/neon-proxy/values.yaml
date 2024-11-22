@@ -65,12 +65,16 @@ settings:
   connectComputeLock: ""
   # settings.redisNotifications -- (url) Configures redis client
   redisNotifications: ""
+  # settings.redisAuthType -- (string) What auth type to use for regional Redis client. "irsa" and "plain" are supported. "plain" means use URI from settings.redisNotifications. "irsa" means AWS IRSA.
+  redisAuthType: "irsa"
+  # settings.sqlOverHttpMaxRequestSizeBytes -- (string) maximum sql-over-http request payload size in bytes
+  sqlOverHttpMaxRequestSizeBytes: "10485760"
+  # settings.sqlOverHttpMaxResponseSizeBytes -- (string) maximum sql-over-http response payload size in bytes
+  sqlOverHttpMaxResponseSizeBytes: "10485760"
   # settings.sqlOverHttpTimeout -- (string) timeout for http connection requests
   sqlOverHttpTimeout: "15s"
   # settings.httpPoolOptIn -- (bool) Sets the SQL over HTTP Pool to opt-in-only mode if true. Set false to enable it always
   httpPoolOptIn: true
-  # settings.disableDynamicRateLimiter -- (bool) Disable dynamic rate limiter
-  disableDynamicRateLimiter: true
   # settings.endpointRpsLimits -- (list) list of rate limiters for connection attempts over different time intervals
   endpointRpsLimits: []
   # settings.wakeComputeLimits -- (list) list of rate limiters for wake_compute over different time intervals
@@ -117,6 +121,10 @@ settings:
   redisUserId: "neon"
   # settings.awsRegion -- (string) Aws region to retrieve credentials
   awsRegion: ""
+  # settings.proxyProtocolV2 -- (string) Whether to enable or disable the parsing of PROXY protocol V2. "rejected", "supported", or "required" are accepted.
+  proxyProtocolV2: ""
+  # settings.extraCmdFlags -- (list) additional arguments to proxy binary
+  extraCmdFlags: []
 
 serviceAccount:
   # serviceAccount.create - Specifies whether a service account should be created
@@ -172,7 +180,10 @@ exposedService:
     # external-dns.alpha.kubernetes.io/hostname: chart-example.local
   # exposedService.type -- Exposed service type
   type: LoadBalancer
-  # exposedService.port -- Exposed Service proxy port
+  # exposedService.externalTrafficPolicy -- externalTrafficPolicy (Cluster, Internal)
+  externalTrafficPolicy: Cluster
+  # exposedService.port -- Exposed Service proxy port.
+  # If null, proxy port will not be exposed. Useful for auth-broker.
   port: 5432
   # exposedService.httpsPort -- (int) Exposed Service https port. If null, https server will not be exposed.
   httpsPort: null

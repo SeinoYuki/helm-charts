@@ -39,7 +39,7 @@ spec:
         args:
         - /bin/sh
         - -c
-        - 'sysctl -w net.ipv4.tcp_keepalive_time=60; sysctl -w net.ipv4.tcp_keepalive_intvl=30; sysctl -w net.ipv4.ip_local_port_range="1024 65535"'
+        - 'sysctl -w net.ipv4.tcp_keepalive_time=60; sysctl -w net.ipv4.tcp_keepalive_intvl=10; sysctl -w net.ipv4.tcp_keepalive_probes=3; sysctl -w net.ipv4.ip_local_port_range="1024 65535"'
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       containers:
         - name: {{ .Chart.Name }}
@@ -81,6 +81,12 @@ spec:
             - {{ . }}
             {{- end }}
             {{- end }}
+            {{- with .Values.settings.sqlOverHttpMaxRequestSizeBytes }}
+            - --sql-over-http-max-request-size-bytes={{ . }}
+            {{ end }}
+            {{- with .Values.settings.sqlOverHttpMaxResponseSizeBytes }}
+            - --sql-over-http-max-response-size-bytes={{ . }}
+            {{ end }}
             {{- with .Values.settings.sqlOverHttpTimeout }}
             - --sql-over-http-timeout={{ . }}
             {{ end }}
@@ -89,13 +95,6 @@ spec:
             - "true"
             {{- else}}
             - --sql-over-http-pool-opt-in
-            - "false"
-            {{- end }}
-            {{- if .Values.settings.disableDynamicRateLimiter }}
-            - --disable-dynamic-rate-limiter
-            - "true"
-            {{- else}}
-            - --disable-dynamic-rate-limiter
             - "false"
             {{- end }}
             {{- if .Values.settings.domain }}
@@ -156,6 +155,10 @@ spec:
             - --redis-notifications
             - {{ . }}
             {{- end }}
+            {{- with .Values.settings.redisAuthType}}
+            - --redis-auth-type
+            - {{ . }}
+            {{- end }}
             {{- with .Values.settings.metricBackupCollectionInterval }}
             - --metric-backup-collection-interval={{ . }}
             {{ end }}
@@ -183,7 +186,12 @@ spec:
             {{- with .Values.settings.awsRegion }}
             - --aws-region={{ . }}
             {{ end }}
-            
+            {{- with .Values.settings.proxyProtocolV2 }}
+            - --proxy-protocol-v2={{ . }}
+            {{- end }}
+            {{- with .Values.settings.extraCmdFlags }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
 
           {{- if .Values.settings }}
           env:
@@ -207,10 +215,11 @@ spec:
             - name: SENTRY_ENVIRONMENT
               value: {{ . }}
             {{- end }}
-            {{- with .Values.settings.controlplane_token }}
             - name: NEON_PROXY_TO_CONTROLPLANE_TOKEN
-              value: {{ . }}
-            {{- end }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "neon-proxy.fullname" . }}-controlplane-token
+                  key: controlplane_token
             {{- with .Values.settings.awsAccessKeyId }}
             - name: AWS_ACCESS_KEY_ID
               value: {{ . }}
